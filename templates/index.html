@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog con FastAPI y sqlite3</title>
+</head>
+
+<body>
+    <h1>Mi Blog</h1>
+    <div id="posts"></div>
+
+    <h2>Crear nuevo post</h2>
+    <form id="postForm">
+        <input type="number" id="id" placeholder="ID" required><br>
+        <input type="text" id="title" placeholder="Título" required><br>
+        <textarea id="content" placeholder="Contenido" required></textarea><br>
+        <button type="submit">Publicar</button>
+    </form>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000/posts";
+
+        async function loadPosts() {
+            const response = await fetch(API_URL);
+            const posts = await response.json();
+            const postsDiv = document.getElementById("posts");
+            postsDiv.innerHTML = "";
+            posts.forEach(post => {
+                postsDiv.innerHTML += `<h3>${post.title}</h3><p>${post.content}</p>`;
+            });
+        }
+
+        document.getElementById("postForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const id = document.getElementById("id").value;
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+
+            await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: parseInt(id), title, content })
+            });
+
+            loadPosts();
+        });
+
+        loadPosts();
+    </script>
+</body>
+
+</html>
